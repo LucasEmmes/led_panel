@@ -5,10 +5,17 @@ class face_c:
     def __init__(self, data_string) -> None:
         # data string is in format "p1,p2,p3"
         data = data_string.split(",")
-        self.p1,self.p2,self.p3 = [point_dict[p] for p in data]
+        self.points = [point_dict[p] for p in data]
 
+    def __repr__(self) -> str:
+        result = "\nfacet normal 0 0 0\n\touter loop"
+        for point in self.points:
+            result += f"\n\t\tvertex {point[0]} {point[1]} {point[2]}"
+        result += "\n\tendloop\nendfacet"
+        return result
 
-
+    def __str__(self) -> str:
+        return repr(self)
 
 def add_to_dict(point_list, names, prefix=""):
     global point_dict
@@ -34,25 +41,25 @@ points_wall_inside = [move_up(p, 3) for p in points_inside_floor]
 add_to_dict(points_wall_inside, "a,b,c,d,e,f", prefix="t")
 
 # HOLE1
-points_opening_topleft_lower = [(-3.75, 9.09, 1), (-3.4, 8.89, 1), (-4.9, -6.29, 1), (-5.25, 6.49, 1)]
-add_to_dict(points_opening_topleft_lower, "g,h,i,j", prefix="b")
+points_opening_topleft_lower = [(-3.75, 9.09, 0.75), (-3.4, 8.89, 0.75), (-4.9, 6.29, 0.75), (-5.25, 6.49, 0.75)]
+add_to_dict(points_opening_topleft_lower, "G,g,h,H", prefix="b")
 
-points_opening_topleft_upper = [move_up(p, 2) for p in points_opening_topleft_lower]
-add_to_dict(points_opening_topleft_upper, "g,h,i,j", prefix="t")
+points_opening_topleft_upper = [move_up(p, 2.25) for p in points_opening_topleft_lower]
+add_to_dict(points_opening_topleft_upper, "G,g,h,H", prefix="t")
 
 # HOLE2
-points_opening_topright_lower = [(3.4, 8.89, 1), (3.75, 9.09, 1), (5.25, 6.49, 1), (4.9, 6.29, 1)]
-add_to_dict(points_opening_topright_lower, "l,m,n,o", prefix="b") 
+points_opening_topright_lower = [(3.4, 8.89, 0.75), (3.75, 9.09, 0.75), (5.25, 6.49, 0.75), (4.9, 6.29, 0.75)]
+add_to_dict(points_opening_topright_lower, "i,I,J,j", prefix="b") 
 
-points_opening_topright_upper = [move_up(p, 2) for p in points_opening_topright_lower]
-add_to_dict(points_opening_topright_lower, "l,m,n,o", prefix="b")
+points_opening_topright_upper = [move_up(p, 2.25) for p in points_opening_topright_lower]
+add_to_dict(points_opening_topright_upper, "i,I,J,j", prefix="t")
 
 # HOLE3
-points_opening_middle_lower = [(-1.5, 0.4, 1), (1.5, 0.4, 1), (1.5, 0, 1), (-1.5, 0, 1)]
-add_to_dict(points_opening_middle_lower, "p,q,r,s", prefix="b")
+points_opening_middle_lower = [(-1.5, 0.4, 0.75), (1.5, 0.4, 0.75), (1.5, 0, 0.75), (-1.5, 0, 0.75)]
+add_to_dict(points_opening_middle_lower, "l,k,K,L", prefix="b")
 
-points_opening_middle_upper = [move_up(p, 2) for p in points_opening_middle_lower]
-add_to_dict(points_opening_middle_upper, "p,q,r,s", prefix="t")
+points_opening_middle_upper = [move_up(p, 2.25) for p in points_opening_middle_lower]
+add_to_dict(points_opening_middle_upper, "l,k,K,L", prefix="t")
 
 
 face_floor_bottom = "bA,bB,bC bC,bD,bE bE,bF,bA bA,bC,bE"
@@ -84,6 +91,13 @@ face_hole_inside_ij,face_hole_inside_kl,face_hole_inside_hg
 ]
 
 
-print(point_dict)
-print()
-print(faces)
+face_objs = []
+for part in faces:
+    face_objs += [face_c(d) for d in part.split(" ")]
+
+f = open("data.stl", "w", encoding="ascii")
+f.write("solid nanoleaf")
+for face in face_objs:
+    f.write(str(face))
+f.write("\nendsolid nanoleaf")
+f.close()
