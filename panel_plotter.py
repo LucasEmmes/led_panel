@@ -1,12 +1,12 @@
 from typing import List, Tuple
 from copy import deepcopy
 
-class Panel:
+class Plot_Panel:
     def __init__(self, coordinates:Tuple[int, int]) -> None:
         self.x, self.y = coordinates
-        self.possible_edges:List[Panel] = []
-        self.connections:List[Panel] = []
-        self.incoming_connection:Panel = None
+        self.possible_edges:List[Plot_Panel] = []
+        self.connections:List[Plot_Panel] = []
+        self.incoming_connection:Plot_Panel = None
 
     def coordinates(self):
         return (self.x, self.y)
@@ -18,10 +18,10 @@ class Panel:
         return self.__repr__()
 
 # List of panels to search through
-panels:List[Panel] = []
+panels:List[Plot_Panel] = []
 
 # Finds panel which is at the tuple's location, None if none is found
-def get_panel_at(coords:Tuple[int, int]) -> Panel | None:
+def get_panel_at(coords:Tuple[int, int]) -> Plot_Panel | None:
     for panel in panels:
         if (panel.x, panel.y) == coords:
             return panel
@@ -29,13 +29,12 @@ def get_panel_at(coords:Tuple[int, int]) -> Panel | None:
     return None
 
 # Selects which connections to make in order to have one continuos series
-def make_tree(panel_coordinates:List[Tuple[int, int]]):
+def make_tree(panel_coordinates:List[Tuple[int, int]]) -> None:
     global panels
 
     # make panels
     for tup in panel_coordinates:
-        panels.append(Panel(tup))
-    # print(panels)
+        panels.append(Plot_Panel(tup))
 
     # make all available connections
     for panel in panels:
@@ -54,9 +53,7 @@ def make_tree(panel_coordinates:List[Tuple[int, int]]):
         udpanel = get_panel_at((panel.x, panel.y+ud))
         if not udpanel is None:
             panel.possible_edges.append(udpanel)
-    
-    # for panel in panels:
-    #     print(f"{panel}: {panel.possible_edges}")
+
 
     # depth-first-search
     queue = [panel for panel in panels]
