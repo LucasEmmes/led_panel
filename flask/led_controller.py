@@ -13,5 +13,6 @@ def color():
         led_control.set_led(int(r), int(g), int(b))
     return render_template("led_controller.html")
 
+
 if __name__=="__main__":
     app.run(debug=True)

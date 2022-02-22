@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+
+        window.addEventListener("load", () => {
+            const canvas = document.querySelector("#canvas");
+            const ctx = canvas.getContext("2d");
+            console.log("yeyeye");
+            // Resizing
+            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth;
+
+            var raw_triangle_data = "{{td}}";
+            var triangles = raw_triangle_data.split(";");
+            triangles.forEach(element => {
+                data = element.split(",");
+                x = parseInt(data[0]);
+                y = parseInt(data[1]);
+                usd = Boolean(parseInt(data[2]));
+                size = parseInt(data[3]);
+                color = data[4];
+
+                draw_triangle(ctx, x, y, usd, size, color);
+            });
+        })
+
+        function draw_triangle(ctx, x, y, upsidedown, size, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            if (upsidedown) {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x+size,y);
+                ctx.lineTo(x+size*0.5, y+size*0.866);
+                ctx.lineTo(x, y);
+            } else {
+                ctx.moveTo(x, y+size*0.866);
+                ctx.lineTo(x+size,y+size*0.866);
+                ctx.lineTo(x+size*0.5, y);
+                ctx.lineTo(x, y+size*0.866);
+            }
+            ctx.fill();
+            console.log("Done");
+        }
+
+    </script>
+    
+</body>
+</html>

@@ -3,7 +3,8 @@ import led_control
 
 app = Flask(__name__)
 
-
+# x,y,usd,size,color
+triangle_data="0,0,1,100,#FFFF00;50,0,0,100,#FF00FF"
 
 # Pages
 @app.route("/")
@@ -19,6 +20,10 @@ def login():
         return redirect(url_for("user", usr=user))
     else:
         return render_template("login.html")
+
+@app.route("/test")
+def test():
+    return render_template("canvas.html", td=triangle_data)
 
 @app.route("/<usr>")
 def user(usr):
