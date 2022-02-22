@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Homepage</title>
+    </head>
+    <body>
+        <h1>Homepage</h1>
+        <p>{{content}}</p>
+        <p>{{r}}</p>
+        {% for x in range(3) %}
+            {% if x%2 == 0 %}
+                <p>Hello {{x}}</p>
+            <!-- {% elif %} -->
+            <!-- {% else %} -->
+            {% endif %}
+            <p>{{l[x]}}</p>
+        {% endfor %}
+    </body>
+</html>

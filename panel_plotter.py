@@ -1,5 +1,4 @@
 from typing import List, Tuple
-from copy import deepcopy
 
 class Plot_Panel:
     def __init__(self, coordinates:Tuple[int, int]) -> None:
@@ -73,7 +72,8 @@ def make_tree(panel_coordinates:List[Tuple[int, int]]) -> None:
 
 def main():
 
-    data = [(-1,0), (0,0), (1,0), (-1,1), (0,1), (1,1)]
+    # data = [(-1,0), (0,0), (1,0), (-1,1), (0,1), (1,1)]
+    data = [(-1,0), (0,0), (1,0), (-1,1), (0,1), (1,1), (2,1),(2,2),(3,2),(4,2)]
 
     make_tree(data)
 
