@@ -8,11 +8,11 @@ LED_BRIGHTNESS = 255
 LED_INVERT = False
 LED_CHANNEL = 0
 
-def set_led(c):
+def set_led(r,g,b):
     strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
     strip.begin()
 
     for i in range(LED_COUNT):
-            strip.setPixelColor(i, Color(c, c, c))
+            strip.setPixelColor(i, Color(r,g,b))
 
     strip.show()
