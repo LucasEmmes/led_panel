@@ -1,4 +1,5 @@
 from flask import Flask, redirect, url_for, render_template, request
+import led_control
 
 app = Flask(__name__)
 
@@ -22,6 +23,11 @@ def login():
 @app.route("/<usr>")
 def user(usr):
     return f"<h1>{usr}</h1>"
+
+@app.route("/color/<c>")
+def color(c):
+    led_control.set_led(int(c))
+    return ""
 
 if __name__=="__main__":
     app.run(debug=True)
