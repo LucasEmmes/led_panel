@@ -28,13 +28,19 @@ def test():
         td = request.form["triangle_1"]
         r,g,b = post_string_to_rgb(td)
         # led_control.set_led(r,g,b)
+        print("AAAA")
+        print(list(request.form.keys()))
+        print(list(request.form.values()))
         return render_template("canvas.html", td=td)
     return render_template("canvas.html", td=triangle_data)
 
-@app.route("/color/<c>")
-def color(c):
-    led_control.set_led(int(c))
-    return ""
+@app.route("/console_test")
+def color():
+    book = {}
+    book["title"] = "Dune"
+    book["author"] = "Unknown"
+    # return "<html><body><script>var book = "+str(book)+";\nconsole.log(book['title']);</script></body></html>"
+    return render_template("console_test.html", x="var book = 12;\n")
 
 def post_string_to_rgb(ps:str):
     r,g,b = [int(i, 16) for i in [ps.split(",")[-1][1:][x:x+2] for x in range(0, 6, 2)]]
