@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <script>
+
+        var triangles = []
+
+        window.addEventListener("load", () => {
+            const canvas = document.querySelector("#canvas");
+            const ctx = canvas.getContext("2d");
+            // Resizing
+            canvas.height = window.innerHeight * 0.9;
+            canvas.width = window.innerWidth * 0.9;
+
+            // RECEIVE AND CONVERT PYTHON DATA TO TRIANGLES
+            // convert_data(raw_triangle_data, ctx);
+            parse_triangle_data("{{triangle_JSON}}");
+            console.log(window.triangles);
+        })
+
+        function parse_color(color) {
+            r = parseInt(color.split(":")[0]);
+            g = parseInt(color.split(":")[1]);
+            b = parseInt(color.split(":")[2]);
+            return [r,g,b];
+        }
+
+        function parse_triangle_data(td) {
+            td = td.replace(/&#34;/g, "\"");
+            console.log(td);
+            var triangle_list = JSON.parse(td);
+            console.log(triangle_list);
+
+            // var triangle_strings = td.split(";")
+            // triangle_strings.forEach(triangle_string => {
+            //     data = triangle_string.split(",");
+
+            //     var tx = parseInt(data[0]);
+            //     var ty = parseInt(data[1]);
+            //     var tpattern = data[2];
+            //     var trgb = parse_color(data[3]);
+            //     var tspeed = parseInt(data[4]);
+            //     var tcycle_count = parseInt(data[5]);
+            //     var tmin = parseInt(data[6]);
+            //     var tmax = parseInt(data[7]);
+
+            //     var triangle = {x = tx, y = ty, rgb = trgb, speed = tspeed, cycle_count = tcycle_count, min = tmin, max = tmax};
+
+            //     window.triangles.push(triangle);
+            // });
+        }
+
+        // function convert_data(raw_triangle_data, ctx) {
+        //     var triangles = raw_triangle_data.split(";");
+        //     triangles.forEach(element => {
+        //         data = element.split(",");
+        //         x = parseInt(data[0]);
+        //         y = parseInt(data[1]);
+        //         usd = Boolean(parseInt(data[2]));
+        //         size = parseInt(data[3]);
+        //         color = data[4];
+
+        //         draw_triangle(ctx, x, y, usd, size, color, false);
+        //     });
+        // }
+
+        function draw_triangle(ctx, x, y, upsidedown, size, color, outlined) {
+            // Set up values
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 5;
+            var stroke_offset = ((outlined) ? 5 : 0);
+
+            // Draw
+            ctx.beginPath();
+            if (upsidedown) {
+                ctx.moveTo(x + stroke_offset, y + stroke_offset);
+                ctx.lineTo(x+size - stroke_offset, y + stroke_offset);
+                ctx.lineTo(x+size*0.5, y+size*0.866 - stroke_offset);
+                ctx.lineTo(x + stroke_offset, y + stroke_offset);
+            } else {
+                ctx.moveTo(x+stroke_offset, y+size*0.866-stroke_offset);
+                ctx.lineTo(x+size-stroke_offset,y+size*0.866-stroke_offset);
+                ctx.lineTo(x+size*0.5, y+stroke_offset);
+                ctx.lineTo(x+stroke_offset, y+size*0.866-stroke_offset);
+            }
+
+            // Check if you want to fill or no
+            if (outlined) {
+                ctx.stroke();
+            } else {
+                ctx.fill();
+            }
+        }
+
+    </script>
+    
+</body>
+</html>
