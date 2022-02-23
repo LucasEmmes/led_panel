@@ -25,76 +25,75 @@
             canvas.width = window.innerWidth * 0.9;
 
             // RECEIVE AND CONVERT PYTHON DATA TO TRIANGLES
-            // convert_data(raw_triangle_data, ctx);
             parse_triangle_data("{{triangle_JSON}}");
-            console.log(window.triangles);
+            display_triangles(ctx);
         })
 
-        function parse_color(color) {
-            r = parseInt(color.split(":")[0]);
-            g = parseInt(color.split(":")[1]);
-            b = parseInt(color.split(":")[2]);
-            return [r,g,b];
-        }
 
         function parse_triangle_data(td) {
             td = td.replace(/&#34;/g, "\"");
-            console.log(td);
             var triangle_list = JSON.parse(td);
-            console.log(triangle_list);
-
-            // var triangle_strings = td.split(";")
-            // triangle_strings.forEach(triangle_string => {
-            //     data = triangle_string.split(",");
-
-            //     var tx = parseInt(data[0]);
-            //     var ty = parseInt(data[1]);
-            //     var tpattern = data[2];
-            //     var trgb = parse_color(data[3]);
-            //     var tspeed = parseInt(data[4]);
-            //     var tcycle_count = parseInt(data[5]);
-            //     var tmin = parseInt(data[6]);
-            //     var tmax = parseInt(data[7]);
-
-            //     var triangle = {x = tx, y = ty, rgb = trgb, speed = tspeed, cycle_count = tcycle_count, min = tmin, max = tmax};
-
-            //     window.triangles.push(triangle);
-            // });
+            window.triangles = triangle_list;
         }
 
-        // function convert_data(raw_triangle_data, ctx) {
-        //     var triangles = raw_triangle_data.split(";");
-        //     triangles.forEach(element => {
-        //         data = element.split(",");
-        //         x = parseInt(data[0]);
-        //         y = parseInt(data[1]);
-        //         usd = Boolean(parseInt(data[2]));
-        //         size = parseInt(data[3]);
-        //         color = data[4];
+        function rgb_to_hex(rgb_tuple) {
+            var r = Number(rgb_tuple[0]).toString(16);
+            var g = Number(rgb_tuple[1]).toString(16);
+            var b = Number(rgb_tuple[2]).toString(16);
 
-        //         draw_triangle(ctx, x, y, usd, size, color, false);
+            return "#" + ((r.length == 1) ? "0" : "") + r + ((g.length == 1) ? "0" : "") + g + ((b.length == 1) ? "0" : "") + b;
+
+        }
+
+        function display_triangles(ctx) {
+            // TODO: Edit this to be dynamic
+            var size = 100;
+
+            window.triangles.forEach(t => {
+                var rgb_hex = rgb_to_hex(t["rgb"]);
+                var upside_down = ((t["x"] + t["y"]) % 2 == 1)
+                draw_triangle_to_screen(ctx, t["x"], t["y"], upside_down, size, rgb_hex, false, 0, 0);
+            });
+        }
+
+
+        // function advance_pattern() {
+        //     window.triangles.forEach(triangle => {
+        //         switch (triangle["pattern"]) {
+        //             case :
+                        
+        //                 break;
+                
+        //             default:
+        //                 break;
+        //         }
         //     });
         // }
 
-        function draw_triangle(ctx, x, y, upsidedown, size, color, outlined) {
+
+        function draw_triangle_to_screen(ctx, x, y, upsidedown, size, color, outlined, x_offset, y_offset) {
             // Set up values
             ctx.fillStyle = color;
             ctx.strokeStyle = color;
             ctx.lineWidth = 5;
             var stroke_offset = ((outlined) ? 5 : 0);
 
+            var adjusted_x = (x + x_offset) * size * 0.5;
+            var adjusted_y = (y + y_offset) * size;
+            var triangle_height = size * 0.866;
+
             // Draw
             ctx.beginPath();
             if (upsidedown) {
-                ctx.moveTo(x + stroke_offset, y + stroke_offset);
-                ctx.lineTo(x+size - stroke_offset, y + stroke_offset);
-                ctx.lineTo(x+size*0.5, y+size*0.866 - stroke_offset);
-                ctx.lineTo(x + stroke_offset, y + stroke_offset);
+                ctx.moveTo(adjusted_x+stroke_offset,        adjusted_y+stroke_offset);
+                ctx.lineTo(adjusted_x-stroke_offset+size,   adjusted_y+stroke_offset);
+                ctx.lineTo(adjusted_x+size*0.5,             adjusted_y-stroke_offset+triangle_height);
+                ctx.lineTo(adjusted_x+stroke_offset,        adjusted_y+stroke_offset);
             } else {
-                ctx.moveTo(x+stroke_offset, y+size*0.866-stroke_offset);
-                ctx.lineTo(x+size-stroke_offset,y+size*0.866-stroke_offset);
-                ctx.lineTo(x+size*0.5, y+stroke_offset);
-                ctx.lineTo(x+stroke_offset, y+size*0.866-stroke_offset);
+                ctx.moveTo(adjusted_x+stroke_offset,        adjusted_y-stroke_offset+triangle_height);
+                ctx.lineTo(adjusted_x-stroke_offset+size,   adjusted_y-stroke_offset+triangle_height);
+                ctx.lineTo(adjusted_x+size*0.5,             adjusted_y+stroke_offset);
+                ctx.lineTo(adjusted_x+stroke_offset,        adjusted_y-stroke_offset+triangle_height);
             }
 
             // Check if you want to fill or no
