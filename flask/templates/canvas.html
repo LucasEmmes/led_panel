@@ -18,7 +18,6 @@
         window.addEventListener("load", () => {
             const canvas = document.querySelector("#canvas");
             const ctx = canvas.getContext("2d");
-            console.log("yeyeye");
             // Resizing
             canvas.height = window.innerHeight;
             canvas.width = window.innerWidth;
@@ -33,26 +32,37 @@
                 size = parseInt(data[3]);
                 color = data[4];
 
-                draw_triangle(ctx, x, y, usd, size, color);
+                draw_triangle(ctx, x, y, usd, size, color, false);
             });
         })
 
-        function draw_triangle(ctx, x, y, upsidedown, size, color) {
+        function draw_triangle(ctx, x, y, upsidedown, size, color, outlined) {
+            // Set up values
             ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 5;
+            var stroke_offset = ((outlined) ? 5 : 0);
+
+            // Draw
             ctx.beginPath();
             if (upsidedown) {
-                ctx.moveTo(x, y);
-                ctx.lineTo(x+size,y);
-                ctx.lineTo(x+size*0.5, y+size*0.866);
-                ctx.lineTo(x, y);
+                ctx.moveTo(x + stroke_offset, y + stroke_offset);
+                ctx.lineTo(x+size - stroke_offset, y + stroke_offset);
+                ctx.lineTo(x+size*0.5, y+size*0.866 - stroke_offset);
+                ctx.lineTo(x + stroke_offset, y + stroke_offset);
             } else {
-                ctx.moveTo(x, y+size*0.866);
-                ctx.lineTo(x+size,y+size*0.866);
-                ctx.lineTo(x+size*0.5, y);
-                ctx.lineTo(x, y+size*0.866);
+                ctx.moveTo(x+stroke_offset, y+size*0.866-stroke_offset);
+                ctx.lineTo(x+size-stroke_offset,y+size*0.866-stroke_offset);
+                ctx.lineTo(x+size*0.5, y+stroke_offset);
+                ctx.lineTo(x+stroke_offset, y+size*0.866-stroke_offset);
             }
-            ctx.fill();
-            console.log("Done");
+
+            // Check if you want to fill or no
+            if (outlined) {
+                ctx.stroke();
+            } else {
+                ctx.fill();
+            }
         }
 
     </script>
