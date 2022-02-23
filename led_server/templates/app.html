@@ -16,6 +16,7 @@
     <script>
 
         var triangles = []
+        var interval;
 
         window.addEventListener("load", () => {
             const canvas = document.querySelector("#canvas");
@@ -26,8 +27,19 @@
 
             // RECEIVE AND CONVERT PYTHON DATA TO TRIANGLES
             parse_triangle_data("{{triangle_JSON}}");
-            display_triangles(ctx);
+            window.interval = setInterval(loop, 10);
         })
+
+        function loop() {
+            const canvas = document.querySelector("#canvas");
+            const ctx = canvas.getContext("2d");
+            // Clear
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            // Advance patterns
+            advance_pattern();
+            // Draw new
+            display_triangles(ctx);
+        }
 
 
         function parse_triangle_data(td) {
@@ -50,25 +62,40 @@
             var size = 100;
 
             window.triangles.forEach(t => {
-                var rgb_hex = rgb_to_hex(t["rgb"]);
+                var rgb_hex = rgb_to_hex(t["next_rgb"]);
                 var upside_down = ((t["x"] + t["y"]) % 2 == 1)
                 draw_triangle_to_screen(ctx, t["x"], t["y"], upside_down, size, rgb_hex, false, 0, 0);
             });
         }
 
 
-        // function advance_pattern() {
-        //     window.triangles.forEach(triangle => {
-        //         switch (triangle["pattern"]) {
-        //             case :
-                        
-        //                 break;
+        function advance_pattern() {
+            window.triangles.forEach(triangle => {
+                switch (triangle["pattern"]) {
+                    case "breathe":
+                        // # Advance cycle
+                        triangle["cycle"] = (triangle["cycle"] + triangle["speed"]) % 512;
+                        // # Get the cycle percentage (how far are we into the cycle)
+                        var cycle_percentage = triangle["cycle"] / 512;
+                        // # How many percent of maximum light are we supposed to give
+                        var light_fraction = (Math.sin(cycle_percentage * 2 * Math.PI) / 2) + 0.5;
+                        // # With regards to min/max how many ACTUAL percent of light to we need
+                        var light_percentage = (light_fraction * (triangle["maximum"] - triangle["minimum"]) + triangle["minimum"]) / 255;
+
+                        // # Apply and return
+                        var r = parseInt(triangle["rgb"][0] * light_percentage);
+                        var g = parseInt(triangle["rgb"][1] * light_percentage);
+                        var b = parseInt(triangle["rgb"][2] * light_percentage);
+
+                        triangle["next_rgb"] = [r,g,b];
+                        break;
                 
-        //             default:
-        //                 break;
-        //         }
-        //     });
-        // }
+                    default:
+                        triangle["next_rgb"] = triangle["rgb"];
+                        break;
+                }
+            });
+        }
 
 
         function draw_triangle_to_screen(ctx, x, y, upsidedown, size, color, outlined, x_offset, y_offset) {

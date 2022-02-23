@@ -12,3 +12,4 @@ class TriangleData:
     minimum:int
     maximum:int
     leds:List[int]
+    
