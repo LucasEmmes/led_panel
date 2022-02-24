@@ -1,7 +1,6 @@
 from rpi_ws281x import *
 from typing import List
 from triangle import *
-from dataclasses import dataclass
 from time import sleep
 
 LED_COUNT = 150
@@ -12,9 +11,10 @@ LED_BRIGHTNESS = 255
 LED_INVERT = False
 LED_CHANNEL = 0
 
-@dataclass
 class Killswitch:
-        kill:bool
+        def __init__(self, kill:bool) -> None:
+                self.kill = kill
+        
 
 def render_loop(triangles:List['TriangleData'], kill:'Killswitch') -> None:
         global LED_COUNT
@@ -31,7 +31,7 @@ def render_triangles(triangles:List['TriangleData'], led_lookup:List[Tuple[int, 
         for triangle in triangles:
 
                 # Get next rgb value from triangle.py
-                rgb = next(triangle)
+                rgb = triangle.next()
                 
                 # Each triangle has a corresponding rgb tuple in a list
                 for led_id in triangle.leds:
