@@ -1,4 +1,5 @@
 from typing import List, Tuple
+import math
 
 class TriangleData:
     def __init__(self, x:int, y:int, pattern:str, rgb:List[int], speed:int, cycle:int, minimum:int, maximum:int, leds:List[int]) -> None:
@@ -21,9 +22,9 @@ class TriangleData:
         
         elif self.pattern == "breathe":
             # Advance cycle
-            self.cycle_counter = (self.cycle_counter + self.speed) % 512
+            self.cycle = (self.cycle + self.speed) % 512
             # Get the cycle percentage (how far are we into the cycle)
-            cycle_percentage = self.cycle_counter / 512
+            cycle_percentage = self.cycle / 512
             # How many percent of maximum light are we supposed to give
             light_fraction = math.sin(cycle_percentage * 2 * math.pi) / 2 + 0.5
             # With regards to min/max how many ACTUAL percent of light to we need
@@ -35,9 +36,9 @@ class TriangleData:
 
         elif self.pattern ==  "rainbow":
             # Advance cycle
-            self.cycle_counter = (self.cycle_counter + self.speed) % 768
+            self.cycle = (self.cycle + self.speed) % 768
             # Find out where we are in the r cycle, g cycle, and b cycle
-            rgb_cycle_percentages = [((self.cycle_counter + i)%768)/256 for i in [0,85, 170]]
+            rgb_cycle_percentages = [((self.cycle + i)%768)/256 for i in [0,85, 170]]
             # Calculate percentage of each color needed
             rgb_light_percentage = [(math.sin(cycle_percentage * 2 * math.pi) / 2 + 0.5) for cycle_percentage in rgb_cycle_percentages]
             

@@ -21,7 +21,7 @@ def home():
         # render to leds
         pass
     # start rendering
-    t = threading.Thread(target=render_loop, args=(triangle_list, thread_running))
+    t = threading.Thread(target=led_control.render_loop, args=(triangle_list, thread_running))
     t.start()
 
     # convert data to json and send to app.html
@@ -48,4 +48,4 @@ def stop():
     return "Stopped"
 
 if __name__=="__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="185.71.210.203")

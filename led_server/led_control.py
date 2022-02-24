@@ -16,13 +16,15 @@ class Killswitch:
                 self.kill = kill
         
 
-def render_loop(triangles:List['TriangleData'], kill:'Killswitch') -> None:
+def render_loop(triangles:List['TriangleData'], killswitch:'Killswitch') -> None:
+        print("thread started")
         global LED_COUNT
         LED_COUNT = len(triangles) * 6
 
         led_lookup = [(0,0,0)]*LED_COUNT
 
-        while not kill:
+        while not killswitch.kill:
+                print("rendering")
                 render_triangles(triangles, led_lookup)
                 sleep(0.1)
 
