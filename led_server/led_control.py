@@ -16,15 +16,13 @@ class Killswitch:
                 self.kill = kill
         
 
-def render_loop(triangles:List['TriangleData'], killswitch:'Killswitch') -> None:
-        print("thread started")
+def render_loop(triangles:List['TriangleData'], kill:'Killswitch') -> None:
         global LED_COUNT
         LED_COUNT = len(triangles) * 6
 
         led_lookup = [(0,0,0)]*LED_COUNT
 
-        while not killswitch.kill:
-                print("rendering")
+        while not kill:
                 render_triangles(triangles, led_lookup)
                 sleep(0.1)
 
@@ -33,21 +31,22 @@ def render_triangles(triangles:List['TriangleData'], led_lookup:List[Tuple[int, 
         for triangle in triangles:
 
                 # Get next rgb value from triangle.py
-                rgb = triangle.next()
+                next_rgb = triangle.next()
                 
                 # Each triangle has a corresponding rgb tuple in a list
                 for led_id in triangle.leds:
-                        set_led(led_id, rgb)
+                        led_lookup[led_id] = next_rgb
 
-        pass
+        set_leds(led_lookup)
 
-def set_led(led_id:int, color:Tuple[int, int, int]) -> None:
-        r, g, b = color
+def set_leds(led_lookup:List[Tuple[int, int, int]]) -> None:
 
         strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
         strip.begin()
 
-        strip.setPixelColor(led_id, Color(r,g,b))
+        for led_id, color in enumerate(led_lookup):
+                r, g, b = color
+                strip.setPixelColor(led_id, Color(r,g,b))
 
         strip.show()
 
