@@ -77,10 +77,6 @@
             var delta_x = Math.abs(max_x - x_offset);
             var delta_y = Math.abs(min_y - y_offset);
 
-            console.log("dx: " + delta_x);
-            console.log("dy: " + delta_y);
-            console.log("xoff: " + x_offset + " | max_x: " + max_x);
-            console.log("yoff: " + y_offset + " | min_y: " + min_y);
             // Dynamic scaling (kill me)
             var size = 1080 / Math.max((delta_x+1)/2 + ((delta_x%2==1) ? 0.5 : 0), delta_y+1) * 0.9;
             console.log("Scaling: " + size);
