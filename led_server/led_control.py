@@ -37,7 +37,9 @@ def render_triangles(triangles:List['TriangleData'], led_lookup:List[Tuple[int, 
                 for led_id in triangle.leds:
                         led_lookup[led_id] = next_rgb
 
-        set_leds(led_lookup)
+        try: set_leds(led_lookup)
+        except: pass
+
 
 def set_leds(led_lookup:List[Tuple[int, int, int]]) -> None:
 
