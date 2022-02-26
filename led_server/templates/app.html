@@ -89,6 +89,31 @@
 
                         triangle["next_rgb"] = [r,g,b];
                         break;
+
+                    case "rainbow":
+                        // # Advance cycle
+                        triangle["cycle"] = (triangle["cycle"] + triangle["speed"]) % 768
+                        // # Find out where we are in the r cycle, g cycle, and b cycle
+                        var cycle_percentages = [
+                            ((triangle["cycle"] + 0)    % 768) / 256,
+                            ((triangle["cycle"] + 85)   % 768) / 256,
+                            ((triangle["cycle"] + 170)  % 768) / 256,
+                        ];
+                        //  # Calculate percentage of each color needed
+                        var rgb_light_percentages = [
+                            (Math.sin(cycle_percentages[0] * 2 * Math.PI) / 2 + 0.5),
+                            (Math.sin(cycle_percentages[1] * 2 * Math.PI) / 2 + 0.5),
+                            (Math.sin(cycle_percentages[2] * 2 * Math.PI) / 2 + 0.5),
+                        ];
+                        // # Apply to r, g, and, b, then return
+                        var next_rgb = [
+                            parseInt(triangle["rgb"][0] * rgb_light_percentages[0]),
+                            parseInt(triangle["rgb"][1] * rgb_light_percentages[1]),
+                            parseInt(triangle["rgb"][2] * rgb_light_percentages[2]),
+                        ];
+
+                        triangle["next_rgb"] = next_rgb;
+                        break;
                 
                     default:
                         triangle["next_rgb"] = triangle["rgb"];

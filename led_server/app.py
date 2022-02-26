@@ -6,6 +6,7 @@ import pickle
 import threading
 import led_control
 
+
 thread_running = led_control.Killswitch(False)
 
 app = Flask(__name__)
@@ -48,4 +49,6 @@ def stop():
     return "Stopped"
 
 if __name__=="__main__":
-    app.run(debug=True, host="185.71.210.203")
+    app.run(debug=True,
+    # host="185.71.210.203"
+    )
