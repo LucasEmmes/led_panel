@@ -42,7 +42,7 @@ def save_pickle_data(data:List['TriangleData']) -> None:
     with open('triangle_data.pickle', 'wb') as f:
         pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
-@app.route("/stop")
+@app.route("/stop/")
 def stop():
     global thread_running
     thread_running.kill = True
