@@ -34,6 +34,10 @@
         }
 
         window.addEventListener("click", (event) => {
+            // console.log("x: " + event.clientX + " | y: " + event.clientY);
+            // console.log(window.triangle_size);
+            // console.log(y_offset);
+
             var type = 0;
             // Number of levels ABOVE y=0 is uneven. Type 1
             if (window.y_offset % 2 == 0) {
@@ -47,20 +51,72 @@
             // Find out which chunk we're in
             var chunk_x = (event.clientX - dx) / (window.triangle_size / 2);
             var chunk_y = (event.clientY - dy) / (window.triangle_size * 0.866); 
+            // console.log(`xoff ${x_offset} | yoff ${window.y_offset}`);
             var tx = 0;
             var ty = window.y_offset - chunk_y;
 
             // Diagonal in (0,0)-chunk grows up if evenness of x_offset and y_offset is same
             // If they are different, then diagonal grows downwards
             // Gonna check for difference with XOR
-            var A = (window.x_offset % 2 == 0) ^ (window.y_offset % 2 == 0)
-            var B = (chunk_x % 2 == 0) ^ (chunk_y % 2 == 0)
-            if (A ^ B) {
-                tx = chunk_x - ((dy < f(dx, true)) ? 0 : 1);
+            if ((window.x_offset % 2 == 0) ^ (window.y_offset % 2 == 0)) {
+                // 0,0 grows up
+
+                // chunk we're in grows up if even(chunk_x) XOR even(chunk_y)
+                if ((chunk_x % 2 == 0) ^ (chunk_y % 2 == 0)) {
+                    // x, y grows up
+                    console.log("your chunk grows up xx");
+
+                    // check if in top triangle
+                    if (dy < f(dx, false)) {
+                        console.log("top");
+                        tx = chunk_x - 1;
+                    } else {
+                        console.log("bottom");
+                        tx = chunk_x;
+                    }
+
+                } else { 
+                    console.log("your chunk grows down xx");
+
+                    // x, y grows down
+                    if (dy < f(dx, true)) {
+                        tx = chunk_x;
+                    } else {
+                        tx = chunk_x - 1;
+                    }
+                }
+                console.log(`dy ${dy} | f(x) ${f(dx)}`);
+
             } else {
-                tx = chunk_x - ((dy < f(dx, false)) ? 1 : 0);
+                // 0,0 grows down
+            
+                // chunk we're in grows down if even(chunk_x) XOR even(chunk_y)
+                if ((chunk_x % 2 == 0) ^ (chunk_y % 2 == 0)) {
+                    console.log("your chunk grows down");
+                    // x, y grows down
+                    // check if in top triangle
+                    if (dy < f(dx, true)) {
+                        console.log("top");
+                        tx = chunk_x;
+                    } else {
+                        console.log("bottom");
+                        tx = chunk_x - 1;
+                    }
+                } else { 
+                    console.log("your chunk grows up");
+                    // x, y grows up
+                    if (dy < f(dx, false)) {
+                        console.log("top");
+
+                        tx = chunk_x - 1;
+                    } else {
+                        console.log("bottom");
+                        tx = chunk_x;
+                    }
+                }
             }
 
+            // console.log(`triangle x ${tx} | triangle y ${ty}`);
             var found = false;
             window.triangles.forEach(triangle => {
                 if (triangle["x"] == tx && triangle["y"] == ty) {
