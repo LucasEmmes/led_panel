@@ -19,11 +19,10 @@
     <canvas id="canvas"></canvas>
     <script>
 
-        var triangles = []
+        var triangles = [];
         var interval;
         var x_offset = y_offset = max_x = min_y = triangle_size = 0;
-
-        var selected = null;
+        var selected_triangles = [];
 
         function f(x, direction) {
             if (direction) {
@@ -61,16 +60,17 @@
                 tx = chunk_x - ((dy < f(dx, false)) ? 1 : 0);
             }
 
-            var found = false;
+            // Toggle triangle in / out of list of selected triangles
             window.triangles.forEach(triangle => {
                 if (triangle["x"] == tx && triangle["y"] == ty) {
-                    window.selected = triangle;
-                    found = true;
+                    if (window.selected_triangles.indexOf(triangle) + 1) {
+                        var i = window.selected_triangles.indexOf(triangle);
+                        window.selected_triangles.splice(i, 1);
+                    } else {
+                        window.selected_triangles.push(triangle);
+                    }
                 }
             });
-            if (!found) {selected = null;}
-            // console.log(`mouseY: ${event.clientY} | f(x) ${f(event.clientX)}`);
-            console.log("\n--\n");
         })
 
         window.addEventListener("load", () => {
@@ -136,10 +136,10 @@
             });
 
             // Highlight selected
-            if (window.selected != null) {
-                upside_down = ((Math.abs(window.selected["x"]) + Math.abs(window.selected["y"])) % 2 == 1);
-                draw_triangle_to_screen(ctx, window.selected["x"], window.selected["y"], upside_down, window.triangle_size, rgb_to_hex([0,0,0]), true, window.x_offset*-1, window.y_offset);
-            }
+            window.selected_triangles.forEach(t => {
+                var upside_down = ((Math.abs(t["x"]) + Math.abs(t["y"])) % 2 == 1);
+                draw_triangle_to_screen(ctx, t["x"], t["y"], upside_down, window.triangle_size, "#000000", true, window.x_offset*-1, window.y_offset);
+            });
         }
 
 
