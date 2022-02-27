@@ -21,6 +21,113 @@
 
         var triangles = []
         var interval;
+        var x_offset = y_offset = max_x = min_y = triangle_size = 0;
+
+        var selected = null;
+
+        function f(x, direction) {
+            if (direction) {
+                return x * 2 * 0.866;
+            } else {
+                return window.triangle_size*0.866 - x * 2 * 0.866;
+            }
+        }
+
+        window.addEventListener("click", (event) => {
+            // console.log("x: " + event.clientX + " | y: " + event.clientY);
+            // console.log(window.triangle_size);
+            // console.log(y_offset);
+
+            var type = 0;
+            // Number of levels ABOVE y=0 is uneven. Type 1
+            if (window.y_offset % 2 == 0) {
+                type = 1;
+            }
+
+            // Find out where we are inside the current chunk
+            var dx = event.clientX % (window.triangle_size / 2);
+            var dy = event.clientY % (window.triangle_size * 0.866);
+
+            // Find out which chunk we're in
+            var chunk_x = (event.clientX - dx) / (window.triangle_size / 2);
+            var chunk_y = (event.clientY - dy) / (window.triangle_size * 0.866); 
+            // console.log(`xoff ${x_offset} | yoff ${window.y_offset}`);
+            var tx = 0;
+            var ty = window.y_offset - chunk_y;
+
+            // Diagonal in (0,0)-chunk grows up if evenness of x_offset and y_offset is same
+            // If they are different, then diagonal grows downwards
+            // Gonna check for difference with XOR
+            if ((window.x_offset % 2 == 0) ^ (window.y_offset % 2 == 0)) {
+                // 0,0 grows up
+
+                // chunk we're in grows up if even(chunk_x) XOR even(chunk_y)
+                if ((chunk_x % 2 == 0) ^ (chunk_y % 2 == 0)) {
+                    // x, y grows up
+                    console.log("your chunk grows up xx");
+
+                    // check if in top triangle
+                    if (dy < f(dx, false)) {
+                        console.log("top");
+                        tx = chunk_x - 1;
+                    } else {
+                        console.log("bottom");
+                        tx = chunk_x;
+                    }
+
+                } else { 
+                    console.log("your chunk grows down xx");
+
+                    // x, y grows down
+                    if (dy < f(dx, true)) {
+                        tx = chunk_x;
+                    } else {
+                        tx = chunk_x - 1;
+                    }
+                }
+                console.log(`dy ${dy} | f(x) ${f(dx)}`);
+
+            } else {
+                // 0,0 grows down
+            
+                // chunk we're in grows down if even(chunk_x) XOR even(chunk_y)
+                if ((chunk_x % 2 == 0) ^ (chunk_y % 2 == 0)) {
+                    console.log("your chunk grows down");
+                    // x, y grows down
+                    // check if in top triangle
+                    if (dy < f(dx, true)) {
+                        console.log("top");
+                        tx = chunk_x;
+                    } else {
+                        console.log("bottom");
+                        tx = chunk_x - 1;
+                    }
+                } else { 
+                    console.log("your chunk grows up");
+                    // x, y grows up
+                    if (dy < f(dx, false)) {
+                        console.log("top");
+
+                        tx = chunk_x - 1;
+                    } else {
+                        console.log("bottom");
+                        tx = chunk_x;
+                    }
+                }
+            }
+
+            // console.log(`triangle x ${tx} | triangle y ${ty}`);
+            var found = false;
+            window.triangles.forEach(triangle => {
+                if (triangle["x"] == tx && triangle["y"] == ty) {
+                    window.selected = triangle;
+                    found = true;
+                }
+            });
+            if (!found) {selected = null;}
+            // console.log(`mouseY: ${event.clientY} | f(x) ${f(event.clientX)}`);
+            console.log("\n--\n");
+        })
 
         window.addEventListener("load", () => {
             const canvas = document.querySelector("#canvas");
@@ -64,29 +171,31 @@
         function display_triangles(ctx) {
 
             // Set up scaling and offset variables
-            var x_offset = 0;
-            var y_offset = 0;
-            var max_x = 0;
-            var min_y = 0;
+            
             window.triangles.forEach(triangle => {
-                if (triangle["x"] < x_offset) {x_offset = triangle["x"]}
-                if (triangle["y"] > y_offset) {y_offset = triangle["y"]}
-                if (triangle["x"] > max_x) {max_x = triangle["x"]}
-                if (triangle["y"] < min_y) {min_y = triangle["y"]}
+                if (triangle["x"] < window.x_offset) {window.x_offset = triangle["x"]}
+                if (triangle["y"] > window.y_offset) {window.y_offset = triangle["y"]}
+                if (triangle["x"] > window.max_x) {window.max_x = triangle["x"]}
+                if (triangle["y"] < window.min_y) {window.min_y = triangle["y"]}
             });
-            var delta_x = Math.abs(max_x - x_offset);
-            var delta_y = Math.abs(min_y - y_offset);
+            var delta_x = Math.abs(window.max_x - window.x_offset);
+            var delta_y = Math.abs(window.min_y - window.y_offset);
 
             // Dynamic scaling (kill me)
-            var size = 1080 / Math.max((delta_x+1)/2 + ((delta_x%2==1) ? 0.5 : 0), delta_y+1) * 0.9;
-            console.log("Scaling: " + size);
+            window.triangle_size = 1080 / Math.max((delta_x+1)/2 + ((delta_x%2==1) ? 0.5 : 0), delta_y+1) * 0.9;
 
             // Draw each triangle
             window.triangles.forEach(t => {
                 var rgb_hex = rgb_to_hex(t["next_rgb"]);
-                var upside_down = ((Math.abs(t["x"]) + Math.abs(t["y"])) % 2 == 1)
-                draw_triangle_to_screen(ctx, t["x"], t["y"], upside_down, size, rgb_hex, false, x_offset*-1, y_offset);
+                var upside_down = ((Math.abs(t["x"]) + Math.abs(t["y"])) % 2 == 1);
+                draw_triangle_to_screen(ctx, t["x"], t["y"], upside_down, window.triangle_size, rgb_hex, false, window.x_offset*-1, window.y_offset);
             });
+
+            // Highlight selected
+            if (window.selected != null) {
+                upside_down = ((Math.abs(window.selected["x"]) + Math.abs(window.selected["y"])) % 2 == 1);
+                draw_triangle_to_screen(ctx, window.selected["x"], window.selected["y"], upside_down, window.triangle_size, rgb_to_hex([0,0,0]), true, window.x_offset*-1, window.y_offset);
+            }
         }
 
 
